@@ -55,7 +55,8 @@ let persons = [
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(persons => {
     res.json(persons.map(person => person.toJSON()))
-  });
+  })
+  .catch(error => next(error))
 })
 
 app.post('/api/persons', (req, res) => {
@@ -88,15 +89,9 @@ app.post('/api/persons', (req, res) => {
   
   person.save().then(response => {
     console.log(`Added ${response.name} number ${response.number} to phonebook`);
-    mongoose.connection.close();
     res.json(response);
   })
-
-  // person.id = Math.round(Math.random()*50000)
-
-  // persons = [...persons, person]
-
-  // res.json(person)
+  .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -125,6 +120,27 @@ app.get('/info', (req, res) => {
   html += `<p>${now}</p>`
   res.send(html)
 })
+
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// olemattomien osoitteiden käsittely
+app.use(unknownEndpoint)
+
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError' && error.kind == 'ObjectId') {
+    return response.status(400).send({ error: error.message })
+  } 
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
