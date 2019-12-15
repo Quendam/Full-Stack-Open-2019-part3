@@ -59,32 +59,44 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-  const person = req.body
-  const found = persons.filter(entry => entry.name === person.name)
+  const body = req.body
+  // const found = persons.filter(entry => entry.name === person.name)
 
-  if(!person.name){
+  if(!body.name){
     return res.status(404).json({
       error: 'Name is missing'
     })
   }
   
-  if(!person.number){
+  if(!body.number){
     return res.status(404).json({
       error: 'Number is missing'
     })
   }
 
-  if(found.length){
-    return res.status(404).json({
-      error: 'Name must be unique'
-    }) 
-  }
+  // if(found.length){
+  //   return res.status(404).json({
+  //     error: 'Name must be unique'
+  //   }) 
+  // }
 
-  person.id = Math.round(Math.random()*50000)
 
-  persons = [...persons, person]
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+  
+  person.save().then(response => {
+    console.log(`Added ${response.name} number ${response.number} to phonebook`);
+    mongoose.connection.close();
+    res.json(response);
+  })
 
-  res.json(person)
+  // person.id = Math.round(Math.random()*50000)
+
+  // persons = [...persons, person]
+
+  // res.json(person)
 })
 
 app.get('/api/persons/:id', (req, res) => {
