@@ -94,16 +94,18 @@ app.post('/api/persons', (req, res) => {
   .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   const id = Number(req.params.id)
-  const person = persons.reduce((prev, current) => current.id === id ? current : prev
-  , null)
 
-  if(person === null) {
-    res.status(404).end()
-  } else {
-    res.json(person)
-  }
+  Person.findById(req.params.id).then(person => {    
+    if(person){
+      res.json(person.toJSON())
+    }else{
+      res.status(404).end()
+    }
+    res.json(persons.map(person => person.toJSON()))
+  })
+  .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -131,9 +133,14 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 app.get('/info', (req, res) => {
   let now = new Date()
-  let html = `<p>Phonebook has info for ${persons.length} people</p>`
-  html += `<p>${now}</p>`
-  res.send(html)
+
+  Person.countDocuments()
+  .then(amount => {  
+    let html = `<p>Phonebook has info for ${amount} people</p>`
+    html += `<p>${now}</p>`
+    res.send(html)
+  })
+  .catch(error => next(error))
 })
 
 
