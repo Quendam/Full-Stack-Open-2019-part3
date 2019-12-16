@@ -59,9 +59,8 @@ app.get('/api/persons', (req, res) => {
   .catch(error => next(error))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
-  // const found = persons.filter(entry => entry.name === person.name)
 
   if(!body.name){
     return res.status(404).json({
@@ -74,13 +73,6 @@ app.post('/api/persons', (req, res) => {
       error: 'Number is missing'
     })
   }
-
-  // if(found.length){
-  //   return res.status(404).json({
-  //     error: 'Name must be unique'
-  //   }) 
-  // }
-
 
   const person = new Person({
     name: body.name,
@@ -157,9 +149,16 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === 'CastError' && error.kind == 'ObjectId') {
     return response.status(400).send({ error: error.message })
-  } 
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
-  next(error)
+  // Unhandled promise rejections are deprecated. So we return 
+  // 'internal server error' when we don't know what the error is.
+  else {
+    return response.status(500).json({error: error});
+  }
+  //next(error)
 }
 
 app.use(errorHandler)
