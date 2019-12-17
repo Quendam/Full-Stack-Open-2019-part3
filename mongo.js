@@ -20,32 +20,32 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 // List entries if we dont get 4th and 5th arguments
-if( process.argv.length < 4){  
+if( process.argv.length < 4){
   Person
-  .find({})
-  .then(persons => {
-    console.log("Phonebook");
-    
-    persons.forEach(person => {
-      console.log(`${person.name} ${person.number}`);
+    .find({})
+    .then(persons => {
+      console.log('Phonebook')
+
+      persons.forEach(person => {
+        console.log(`${person.name} ${person.number}`)
+      })
+
+      mongoose.connection.close()
     })
-  
-    mongoose.connection.close()
-  })  
 
 // Add new entry
 } else {
 
   const name = process.argv[3]
   const number = process.argv[4]
-  
+
   const person = new Person({
     name: name,
     number: number,
   })
-  
+
   person.save().then(response => {
-    console.log(`Added ${response.name} number ${response.number} to phonebook`);
-    mongoose.connection.close();
+    console.log(`Added ${response.name} number ${response.number} to phonebook`)
+    mongoose.connection.close()
   })
 }

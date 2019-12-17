@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
+    "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf build && cd ../Full-Stack-Open-2019/osa2/puhelinluettelo/ && npm run build --prod && cp -r build ../../../Full-Stack-Open-2019-part3/",
     "build-win:ui": "rd -rs build && cd ../Full-Stack-Open-2019/osa2/puhelinluettelo/ && npm run build --prod && cp -r build ../../../Full-Stack-Open-2019-part3/",
@@ -33,6 +34,7 @@
     "morgan": "^1.9.1"
   },
   "devDependencies": {
+    "eslint": "^6.7.2",
     "nodemon": "^2.0.1"
   }
 }
